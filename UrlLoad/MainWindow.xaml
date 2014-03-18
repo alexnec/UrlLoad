@@ -1,0 +1,25 @@
+﻿<Window x:Class="UrlLoad.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="625">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="70"/>
+        </Grid.RowDefinitions>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <ListBox Name="lbURLs" Grid.Row="1" Margin="5,0,0,0"
+                 Grid.Column="0" Grid.ColumnSpan="2">
+            
+        </ListBox>
+        <DockPanel Grid.Row="2" Grid.Column="2">
+            <Button Name="btnGetRes" Width="120" Height="30" Content="Load resourses" Click="btnGetRes_Click"></Button>
+        </DockPanel>
+    </Grid>
+</Window>
