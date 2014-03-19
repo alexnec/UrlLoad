@@ -42,7 +42,6 @@ namespace UrlLoad
 
             FileLoaded += (s, e) =>
             {
-                Thread.Sleep(1000);
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     this.lblCountFiles.Content = i.ToString();
@@ -77,10 +76,10 @@ namespace UrlLoad
             {
                 using (WebClient webClient = new WebClient())
                 {
-                    webClient.DownloadFile(urlResources, AppDomain.CurrentDomain.BaseDirectory + Interlocked.Increment(ref i) + ".html");
-                    Thread.Sleep(1000);
                     if (FileLoaded != null)
                         FileLoaded(null, null);
+                    webClient.DownloadFile(urlResources, AppDomain.CurrentDomain.BaseDirectory + Interlocked.Increment(ref i) + ".html");
+                    Thread.Sleep(1000);
                 }
             }
         }
