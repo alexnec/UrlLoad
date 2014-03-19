@@ -35,21 +35,25 @@ namespace UrlLoad
             lbURLs.Items.Add(@"http://www.yandex.ru/");
             lbURLs.Items.Add(@"http://www.nalog.ru/");
             lbURLs.Items.Add(@"http://mvccontrib.codeplex.com/");
+            lbURLs.Items.Add(@"http://inosmi.ru/");
+            lbURLs.Items.Add(@"http://altapress.ru/");
+            lbURLs.Items.Add(@"http://news.mail.ru/");
+            lbURLs.Items.Add(@"http://mail.ru/");
+
             FileLoaded += (s, e) =>
             {
                 Thread.Sleep(1000);
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     this.lblCountFiles.Content = i.ToString();
-                    //Interlocked.Exchange(ref this.lblCountFiles.Content, 83); 
-
+                    //Interlocked.Exchange(ref lblCountFiles.Content, 83); 
                 }));
             };
         }
 
         private void btnGetRes_Click(object sender, RoutedEventArgs e)
         {
-            this.lblCountFiles.Content = "TT";
+            this.lblCountFiles.Content = "Загружаем...";
                 Task.Factory.StartNew(() =>
                 {
                     LoadResourses();
@@ -58,6 +62,7 @@ namespace UrlLoad
 
         void LoadResourses()
         {
+            /*
             Parallel.ForEach(lbURLs.Items.OfType<string>(), urlResources =>
             {
                 using (WebClient webClient = new WebClient())
@@ -66,7 +71,18 @@ namespace UrlLoad
                     if (FileLoaded != null)
                         FileLoaded(null, null);
                 }
-            });
+            });*/
+
+            foreach(string urlResources in lbURLs.Items)
+            {
+                using (WebClient webClient = new WebClient())
+                {
+                    webClient.DownloadFile(urlResources, AppDomain.CurrentDomain.BaseDirectory + Interlocked.Increment(ref i) + ".html");
+                    Thread.Sleep(1000);
+                    if (FileLoaded != null)
+                        FileLoaded(null, null);
+                }
+            }
         }
     }
 }
