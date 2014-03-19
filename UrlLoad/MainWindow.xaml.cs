@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace UrlLoad
 {
@@ -22,6 +23,9 @@ namespace UrlLoad
     /// </summary>
     public partial class MainWindow : Window
     {
+        event EventHandler FileLoaded;
+        int i = 0;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -31,10 +35,21 @@ namespace UrlLoad
             lbURLs.Items.Add(@"http://www.yandex.ru/");
             lbURLs.Items.Add(@"http://www.nalog.ru/");
             lbURLs.Items.Add(@"http://mvccontrib.codeplex.com/");
+            FileLoaded += (s, e) =>
+            {
+                Thread.Sleep(1000);
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    this.lblCountFiles.Content = i.ToString();
+                    //Interlocked.Exchange(ref this.lblCountFiles.Content, 83); 
+
+                }));
+            };
         }
 
         private void btnGetRes_Click(object sender, RoutedEventArgs e)
         {
+            this.lblCountFiles.Content = "TT";
                 Task.Factory.StartNew(() =>
                 {
                     LoadResourses();
@@ -43,13 +58,13 @@ namespace UrlLoad
 
         void LoadResourses()
         {
-            int i = 0;
             Parallel.ForEach(lbURLs.Items.OfType<string>(), urlResources =>
             {
                 using (WebClient webClient = new WebClient())
                 {
                     webClient.DownloadFile(urlResources, AppDomain.CurrentDomain.BaseDirectory + Interlocked.Increment(ref i)  + ".html");
-                    this.lblCountFiles.Content = i.ToString();
+                    if (FileLoaded != null)
+                        FileLoaded(null, null);
                 }
             });
         }
