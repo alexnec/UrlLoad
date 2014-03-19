@@ -23,8 +23,12 @@ namespace UrlLoad
     /// </summary>
     public partial class MainWindow : Window
     {
-        event EventHandler FileLoaded;
-        int i = 0;
+        delegate void FileLoadedType(string s);
+        FileLoadedType FileLoaded;
+        //Action FileLoaded;
+        int numberLoadedFile = 0;
+        int countFiles = 0;
+        object lockOn = new Object();
 
         public MainWindow()
         {
@@ -39,47 +43,45 @@ namespace UrlLoad
             lbURLs.Items.Add(@"http://altapress.ru/");
             lbURLs.Items.Add(@"http://news.mail.ru/");
             lbURLs.Items.Add(@"http://mail.ru/");
-
-            FileLoaded += (s, e) =>
+            
+            FileLoaded += (string s) =>
             {
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    this.lblCountFiles.Content = i.ToString();
-                    //Interlocked.Exchange(ref lblCountFiles.Content, 83); 
+                    lock (lockOn)
+                    {
+                        countFiles++;
+                        this.lblCountFiles.Content = countFiles.ToString();
+                        lbOrder.Items.Add(countFiles.ToString() + " -- " + s);
+                        if (lbURLs.Items.Count == countFiles)
+                          this.lblStatusLoad.Content = "Завершено";
+                    }
                 }));
             };
         }
 
         private void btnGetRes_Click(object sender, RoutedEventArgs e)
         {
-            this.lblCountFiles.Content = "Загружаем...";
-                Task.Factory.StartNew(() =>
-                {
-                    LoadResourses();
-                });
+            numberLoadedFile = 0;
+            countFiles = 0;
+            this.lblCountFiles.Content = "0";
+            this.lblStatusLoad.Content = "Загрузка...";
+            LoadResourses();   
         }
 
         void LoadResourses()
         {
-            /*
-            Parallel.ForEach(lbURLs.Items.OfType<string>(), urlResources =>
-            {
-                using (WebClient webClient = new WebClient())
-                {
-                    webClient.DownloadFile(urlResources, AppDomain.CurrentDomain.BaseDirectory + Interlocked.Increment(ref i)  + ".html");
-                    if (FileLoaded != null)
-                        FileLoaded(null, null);
-                }
-            });*/
-
             foreach(string urlResources in lbURLs.Items)
             {
                 using (WebClient webClient = new WebClient())
                 {
-                    if (FileLoaded != null)
-                        FileLoaded(null, null);
-                    webClient.DownloadFile(urlResources, AppDomain.CurrentDomain.BaseDirectory + Interlocked.Increment(ref i) + ".html");
-                    Thread.Sleep(1000);
+                    ThreadPool.QueueUserWorkItem((o) => {
+                        webClient.DownloadFile(urlResources, AppDomain.CurrentDomain.BaseDirectory 
+                            + Interlocked.Increment(ref numberLoadedFile) + ".html");
+                        
+                        if (FileLoaded != null)
+                            FileLoaded(urlResources);
+                    }); 
                 }
             }
         }
