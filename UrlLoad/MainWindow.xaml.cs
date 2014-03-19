@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -47,8 +48,8 @@ namespace UrlLoad
             {
                 using (WebClient webClient = new WebClient())
                 {
-                    webClient.DownloadFile(urlResources, AppDomain.CurrentDomain.BaseDirectory + i++ + ".html");
-                    //this.lblCountFiles.Content = Thread.CurrentThread.ManagedThreadId.ToString();
+                    webClient.DownloadFile(urlResources, AppDomain.CurrentDomain.BaseDirectory + Interlocked.Increment(ref i)  + ".html");
+                    this.lblCountFiles.Content = i.ToString();
                 }
             });
         }
