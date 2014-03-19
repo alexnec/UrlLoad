@@ -18,6 +18,10 @@
                  Grid.Column="0" Grid.ColumnSpan="2">
             
         </ListBox>
+        <StackPanel Grid.Column="2" Grid.Row="1" >
+            <Label Content="Колличество загруженных файлов" />
+            <Label Name="lblCountFiles" Content="0"  HorizontalAlignment="Center"/>
+        </StackPanel>
         <DockPanel Grid.Row="2" Grid.Column="2">
             <Button Name="btnGetRes" Width="120" Height="30" Content="Load resourses" Click="btnGetRes_Click"></Button>
         </DockPanel>
