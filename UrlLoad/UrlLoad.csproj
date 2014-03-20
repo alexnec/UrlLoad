@@ -54,7 +54,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="SampleDispose\BaseFile.cs" />
-    <Compile Include="SampleDispose\Speсial.cs" />
+    <Compile Include="SampleDispose\SpeсialFile.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

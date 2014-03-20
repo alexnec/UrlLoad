@@ -9,6 +9,7 @@ namespace UrlLoad.SampleDispose
 {
     public class BaseFile : IDisposable
     {
+        private bool disposed = false;
         protected FileStream fs;
 
         public BaseFile()
@@ -22,9 +23,35 @@ namespace UrlLoad.SampleDispose
             fs.Write(array, 0, array.Length);
         }
 
+        // not sealed
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    //free only manage resourses
+                }
+
+                //free unmanaged resourses
+                disposed = true;
+            }
+        }
+
+        //for sealed
+        //private void Dispose(bool disposing) { }
+
         public void Dispose()
         {
-            fs.Close();
+            //fs.Close();
+            Dispose(true);
+            // stop run finalize
+            GC.SuppressFinalize(this);
+        }
+
+        ~BaseFile()
+        {
+            Dispose(false);
         }
     }
 }
