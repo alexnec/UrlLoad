@@ -60,13 +60,13 @@ namespace UrlLoad
             };
         }
 
-        private void btnGetRes_Click(object sender, RoutedEventArgs e)
+        private async void btnGetRes_Click(object sender, RoutedEventArgs e)
         {
             numberLoadedFile = 0;
             countFiles = 0;
             this.lblCountFiles.Content = "0";
             this.lblStatusLoad.Content = "Загрузка...";
-            
+           /* 
            var task = LoadResourses();
            task.ContinueWith(p =>
             {
@@ -75,8 +75,42 @@ namespace UrlLoad
                     this.lblStatusLoad.Content = "Завершено";
                 }));
             });
+            */
+            /*this.lblStatusLoad.Content = "Завершено";
+            task.ContinueWith(p =>
+            {
+                this.lblStatusLoad.Content = "Завершено";
+            }, TaskScheduler.FromCurrentSynchronizationContext());*/
+
+            await LoadResourses();
+            this.lblStatusLoad.Content = "Завершено";
         }
 
+        async Task LoadResourses()
+        {
+            TaskCreationOptions atp = TaskCreationOptions.AttachedToParent;
+            Task methodTask = Task.Factory.StartNew(() =>
+            {
+                foreach (string urlResources in lbURLs.Items)
+                {
+                    Task.Factory.StartNew(() =>
+                    {
+                        using (WebClient webClient = new WebClient())
+                        {
+                            webClient.DownloadFile(urlResources, AppDomain.CurrentDomain.BaseDirectory
+                                + Interlocked.Increment(ref numberLoadedFile) + ".html");
+
+                            if (FileLoaded != null)
+                                FileLoaded(urlResources);
+                        }
+                    }, atp);
+                }
+            });
+            await methodTask;
+            return;
+        }
+
+        /*
         Task LoadResourses()
         {
             TaskCreationOptions atp = TaskCreationOptions.AttachedToParent;
@@ -98,7 +132,7 @@ namespace UrlLoad
                     }
                 });
             return methodTask;
-        }
+        }*/
         /*
         void LoadResourses()
         {
