@@ -93,6 +93,7 @@ namespace UrlLoad
             {
                 foreach (string urlResources in lbURLs.Items)
                 {
+                    
                     Task.Factory.StartNew(() =>
                     {
                         using (WebClient webClient = new WebClient())
@@ -104,6 +105,7 @@ namespace UrlLoad
                                 FileLoaded(urlResources);
                         }
                     }, atp);
+                     
                 }
             });
             await methodTask;
