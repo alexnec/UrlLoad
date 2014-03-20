@@ -53,8 +53,8 @@ namespace UrlLoad
                         countFiles++;
                         this.lblCountFiles.Content = countFiles.ToString();
                         lbOrder.Items.Add(countFiles.ToString() + " -- " + s);
-                        if (lbURLs.Items.Count == countFiles)
-                          this.lblStatusLoad.Content = "Завершено";
+                       // if (lbURLs.Items.Count == countFiles)
+                         // this.lblStatusLoad.Content = "Завершено";
                     }
                 }));
             };
@@ -66,24 +66,55 @@ namespace UrlLoad
             countFiles = 0;
             this.lblCountFiles.Content = "0";
             this.lblStatusLoad.Content = "Загрузка...";
-            LoadResourses();   
+            
+           var task = LoadResourses();
+           task.ContinueWith(p =>
+            {
+                Dispatcher.Invoke(new Action(() =>
+                {
+                    this.lblStatusLoad.Content = "Завершено";
+                }));
+            });
         }
 
+        Task LoadResourses()
+        {
+            TaskCreationOptions atp = TaskCreationOptions.AttachedToParent;
+            Task methodTask = Task.Factory.StartNew(() =>
+                {
+                    foreach (string urlResources in lbURLs.Items)
+                    {
+                        Task.Factory.StartNew(() =>
+                        {
+                            using (WebClient webClient = new WebClient())
+                            {
+                                webClient.DownloadFile(urlResources, AppDomain.CurrentDomain.BaseDirectory
+                                    + Interlocked.Increment(ref numberLoadedFile) + ".html");
+
+                                if (FileLoaded != null)
+                                    FileLoaded(urlResources);
+                            }
+                        }, atp);
+                    }
+                });
+            return methodTask;
+        }
+        /*
         void LoadResourses()
         {
             foreach(string urlResources in lbURLs.Items)
             {
-                using (WebClient webClient = new WebClient())
-                {
-                    ThreadPool.QueueUserWorkItem((o) => {
-                        webClient.DownloadFile(urlResources, AppDomain.CurrentDomain.BaseDirectory 
+                ThreadPool.QueueUserWorkItem((o) => {
+                    using (WebClient webClient = new WebClient())
+                    {
+                        webClient.DownloadFile(urlResources, AppDomain.CurrentDomain.BaseDirectory
                             + Interlocked.Increment(ref numberLoadedFile) + ".html");
-                        
+
                         if (FileLoaded != null)
                             FileLoaded(urlResources);
-                    }); 
-                }
+                    }
+                }); 
             }
-        }
+        }*/
     }
 }
